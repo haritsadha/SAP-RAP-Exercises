@@ -1,0 +1,60 @@
+method IF_RAP_QUERY_PROVIDER~SELECT.
+*&---CDS 视图内表
+    DATA:lt_itab TYPE STANDARD TABLE OF ZRAP_C_001.
+*&---页size
+    DATA(lv_top) = io_request->get_paging( )->get_page_size( ).
+*&---页偏移量
+    DATA(lv_skip) = io_request->get_paging( )->get_offset( ).
+*&---显示字段
+    DATA(lt_fields) = io_request->get_requested_elements( ).
+*&---排序字段
+    DATA(lt_sort)   = io_request->get_sort_elements( ).
+*&---排序SQL
+    DATA lv_orderby_string TYPE string.
+*&---显示字段
+    DATA lv_select_string TYPE string.
+*&---orderby was called,根据UI 获取排序
+    IF lt_sort IS NOT INITIAL.
+      CLEAR lv_orderby_string.
+      LOOP AT lt_sort INTO DATA(ls_sort).
+        IF ls_sort-descending = abap_true.
+          CONCATENATE lv_orderby_string ls_sort-element_name 'DESCENDING' INTO lv_orderby_string SEPARATED BY space.
+        ELSE.
+          CONCATENATE lv_orderby_string ls_sort-element_name 'ASCENDING' INTO lv_orderby_string SEPARATED BY space.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+*&---select handling，UI 选择字段，若无为*全部字段
+    IF lt_fields IS NOT INITIAL.
+      CONCATENATE LINES OF lt_fields INTO lv_select_string SEPARATED BY ','.
+    ELSE.
+      lv_select_string = '*'.
+    ENDIF.
+*&---filter，UI 过滤器选项
+    DATA(lo_clause) = io_request->get_filter( )->get_as_sql_string( ).
+*&---UI RAP 数据请求
+    IF  io_request->is_data_requested( ).
+*&---UI 过滤器条件获取
+      TRY.
+          ##NEEDED  DATA(lt_filter_cond) = io_request->get_filter( )->get_as_ranges( ).
+        ##NEEDED ##NO_HANDLER   CATCH cx_rap_query_filter_no_range INTO DATA(lo_no_sel_option).
+      ENDTRY.
+*&---UI 获取数据，分页数据
+      SELECT (lv_select_string)                           "#EC CI_SUBRC
+        FROM ZRAP_C_001
+       WHERE (lo_clause)
+        INTO CORRESPONDING FIELDS OF TABLE @lt_itab
+          UP TO @lv_top ROWS.
+*&---数据条目确定
+      SELECT COUNT(*)                                     "#EC CI_SUBRC
+        INTO @DATA(lv_lines)
+        FROM ZRAP_C_001
+       WHERE (lo_clause) .
+*&---若为初次则设置总记录条目数(必须)
+      IF io_request->is_total_numb_of_rec_requested( ).
+        io_response->set_total_number_of_records( lv_lines ).
+      ENDIF.
+*&---重置UI 前端表内容(必须)
+      io_response->set_data( lt_itab ).
+    ENDIF.
+  endmethod.   
