@@ -1,0 +1,11 @@
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Search help for currency'
+define view entity ZRAP_VH_0001 as select from I_Currency {
+    key Currency as CurrencyCode,
+    Decimals,
+    CurrencyISOCode,
+    AlternativeCurrencyKey,
+    IsPrimaryCurrencyForISOCrcy,
+    /* Associations */
+    _Text
+}

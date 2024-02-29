@@ -1,0 +1,13 @@
+Description=DM2
+Type=HTTPS
+TrustAll=true
+Authentication=BasicAuthentication
+User=UserID
+Password=*******
+Name=DM2
+ProxyType=Internet
+URL=https://192.168.11.20:44310/
+WebIDEUsage=odata_abap,ui5_execute_abap,dev_abap,odata_gen
+WebIDESystem=DM2
+WebIDEEnabled=true
+sap-client=100

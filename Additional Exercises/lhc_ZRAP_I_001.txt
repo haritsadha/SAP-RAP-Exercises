@@ -1,0 +1,46 @@
+CLASS lhc_ZRAP_I_001 DEFINITION INHERITING FROM cl_abap_behavior_handler.
+  PRIVATE SECTION.
+    METHODS del FOR MODIFY
+      IMPORTING keys FOR ACTION zrap_i_001~del .
+
+    METHODS get_features FOR FEATURES
+      IMPORTING keys REQUEST requested_features FOR zrap_i_001 RESULT result.
+
+ENDCLASS.
+
+CLASS lhc_ZRAP_I_001 IMPLEMENTATION.
+
+  METHOD del.
+
+    DATA lv_travel_id TYPE zrap_t_001-travel_id.
+
+    LOOP AT keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+      lv_travel_id = <ls_key>-travel_id.
+    ENDLOOP.
+
+    DELETE FROM zrap_t_001 WHERE travel_id = lv_travel_id.
+
+  ENDMETHOD.
+
+  METHOD get_features.
+
+    READ ENTITIES OF zrap_i_001 IN LOCAL MODE
+    ENTITY zrap_i_001
+    FIELDS ( travel_id )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_head)
+    FAILED failed.
+
+    result = VALUE #( FOR ls_head IN lt_head
+                        ( %tky = ls_head-%tky
+                          %action-del = COND #( WHEN ls_head-travel_id = '103'
+                                                THEN if_abap_behv=>fc-o-enabled
+                                                WHEN ls_head-travel_id = '107'
+                                                THEN if_abap_behv=>fc-o-enabled
+                                                ELSE if_abap_behv=>fc-o-disabled )
+                          )
+                         ).
+
+  ENDMETHOD.
+
+ENDCLASS.

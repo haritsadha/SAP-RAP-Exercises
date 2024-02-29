@@ -1,0 +1,73 @@
+@EndUserText.label: 'Data model for travel'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@UI: {
+ headerInfo: { typeName: 'Travel', typeNamePlural: 'Travel', title: { type: #STANDARD, value: 'TravelID' } } }
+
+@Search.searchable: true
+define root view entity ZRAP_C_0001 
+as projection on ZRAP_I_0001
+{
+      @UI.facet: [ { id:              'Travel',
+                     purpose:         #STANDARD,
+                     type:            #IDENTIFICATION_REFERENCE,
+                     label:           'Travel',
+                     position:        10 } ]
+
+      @UI.hidden: true
+  key mykey              as TravelUUID,
+
+
+      @UI: {
+          lineItem:       [ { position: 10, importance: #HIGH } ],
+          identification: [ { position: 10, label: 'Travel ID' } ] }
+      @Search.defaultSearchElement: true
+  key travel_id          as TravelID,
+
+      @UI: {
+          lineItem:       [ { position: 20, importance: #HIGH } ],
+          identification: [ { position: 20 } ],
+          selectionField: [ { position: 20 } ] }
+      @Search.defaultSearchElement: true
+      agency_id          as AgencyID,
+      AgencyName         as AgencyName,
+
+      @UI: {
+          lineItem:       [ { position: 30, importance: #HIGH } ],
+          identification: [ { position: 30 } ],
+          selectionField: [ { position: 30 } ] }
+      @Search.defaultSearchElement: true
+      customer_id        as CustomerID,
+
+      @UI.hidden: true
+      CustomerName       as CustomerName,
+
+      @UI: {
+          lineItem:       [ { position: 40, importance: #MEDIUM } ],
+          identification: [ { position: 40 } ] }
+      begin_date         as BeginDate,
+
+      @UI: {
+          lineItem:       [ { position: 41, importance: #MEDIUM } ],
+          identification: [ { position: 41 } ] }
+      end_date           as EndDate,
+
+      @UI: {
+          lineItem:       [ { position: 50, importance: #MEDIUM } ],
+          identification: [ { position: 50, label: 'Total Price' } ] }
+      @Semantics.amount.currencyCode: 'CurrencyCode'
+      total_price        as TotalPrice,
+
+      currency_code      as CurrencyCode,
+
+      @UI: {
+      lineItem:       [ { position: 60, importance: #HIGH }],
+      identification: [ { position: 60, label: 'Status' } ]  }
+      overall_status     as TravelStatus,
+
+      @UI.identification: [ { position: 70, label: 'Remarks' } ]
+      description        as Description,
+
+      @UI.hidden: true
+      last_changed_at    as LastChangedAt
+
+}
